@@ -12,8 +12,18 @@ I have created :
     - ssl/tls termination
     - custom domain and ssl
 - have tried to automate this as much as possible with terraform , with minimal
-- after deploy , i make little touches like
-    - edit policy of bucket (enable Block all public access), to be accessible only from cloud front ( since there is nothing dynamic at our page , we can use static cached content only)
+- Way to run the "application" or the automation
+    - I use local backend ( if you want to use s3 , set it up )
+    - terraform init and terraform apply ( if apply fails , apply again (resource might not be created yet))
+    - output would be as such:
+    Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+
+    Outputs:
+
+    cloudfront_domain_name = "dy8jwd3i8h7j5.cloudfront.net"
+
+    - that is the link we can access our app 
+    - edit policy of bucket, to be accessible only from cloud front ( since there is nothing dynamic at our page , we can use static cached content only)
     https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html
     {
     "Version": "2012-10-17",
@@ -45,7 +55,62 @@ I have created :
     }
 
 
-    Access page : https://d26dmj7dsow997.cloudfront.net/
+    OR
+
+
+    we can edit policy as such , in order to be able to access static page from s3 link provided (ex: http://my-static-website-lorem-ipsum.s3-website-us-east-1.amazonaws.com ):
+
+    {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AllowCloudFrontServicePrincipal",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "cloudfront.amazonaws.com"
+            },
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::my-static-website-lorem-ipsum/*",
+            "Condition": {
+                "StringEquals": {
+                    "AWS:SourceArn": "arn:aws:cloudfront::167730638447:distribution/E156ZCCY8MKB66"
+                }
+            }
+        },
+        {
+            "Sid": "ModifyBucketPolicy",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": [
+                "s3:GetBucketPolicy",
+                "s3:PutBucketPolicy"
+            ],
+            "Resource": [
+                "arn:aws:s3:::my-static-website-lorem-ipsum",
+                "arn:aws:s3:::my-static-website-lorem-ipsum/*"
+            ]
+        },
+        {
+            "Sid": "PublicReadGetObject",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": [
+                "arn:aws:s3:::my-static-website-lorem-ipsum",
+                "arn:aws:s3:::my-static-website-lorem-ipsum/*"
+            ]
+        },
+        {
+            "Sid": "4",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity E2RYP7GDAQ6Z9L"
+            },
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::my-static-website-lorem-ipsum/*"
+        }
+    ]
+}
     
 
 

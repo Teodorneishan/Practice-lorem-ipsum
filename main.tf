@@ -60,10 +60,10 @@ resource "aws_s3_bucket_website_configuration" "my_bucket" {
 ##  }
 #}
 
-resource "aws_s3_bucket_acl" "my_bucket_acl" {
-  bucket = aws_s3_bucket.my_bucket.bucket
-  acl    = "private"
-}
+# resource "aws_s3_bucket_acl" "my_bucket_acl" {
+#   bucket = aws_s3_bucket.my_bucket.bucket
+#   acl    = "private"
+# }
 
 # Resource to avoid error "AccessControlListNotSupported: The bucket does not allow ACLs"
 # resource "aws_s3_bucket_ownership_controls" "s3_bucket_acl_ownership" {
