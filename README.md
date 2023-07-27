@@ -11,7 +11,7 @@ I have created :
     - caching
     - ssl/tls termination
     - custom domain and ssl
-- have tried to automate this as much as possible with terraform , with minimal
+- have tried to automate this as much as possible with terraform 
 - Way to run the "application" or the automation
     - I use local backend ( if you want to use s3 , set it up )
     - terraform init and terraform apply ( if apply fails , apply again (resource might not be created yet))
